@@ -10,4 +10,4 @@ grpc:
     max-retry-attempts: 10
   channels:
     keyManager:
-      address: '${KEY_MANAGER_HOST:localhost}:${KEY_MANAGER_PORT:50051}'
+      address: '${KEY_MANAGER_GRPC_HOST:localhost}:${KEY_MANAGER_GRPC_PORT:50051}'
