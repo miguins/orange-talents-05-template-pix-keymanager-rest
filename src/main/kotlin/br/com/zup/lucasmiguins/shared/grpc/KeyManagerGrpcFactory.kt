@@ -1,6 +1,7 @@
 package br.com.zup.lucasmiguins.shared.grpc
 
 import br.com.zup.lucasmiguins.grpc.KeymanagerRegistraGrpcServiceGrpc
+import br.com.zup.lucasmiguins.grpc.KeymanagerRemoveGrpcServiceGrpc
 import io.grpc.ManagedChannel
 import io.micronaut.context.annotation.Factory
 import io.micronaut.grpc.annotation.GrpcChannel
@@ -11,4 +12,7 @@ class KeyManagerGrpcFactory(@GrpcChannel("keyManager") val channel: ManagedChann
 
     @Singleton
     fun registraChave() = KeymanagerRegistraGrpcServiceGrpc.newBlockingStub(channel)
+
+    @Singleton
+    fun removeChave() = KeymanagerRemoveGrpcServiceGrpc.newBlockingStub(channel)
 }

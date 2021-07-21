@@ -2,8 +2,8 @@ package br.com.zup.lucasmiguins.pix.registra
 
 import br.com.zup.lucasmiguins.grpc.KeymanagerRegistraGrpcServiceGrpc
 import br.com.zup.lucasmiguins.grpc.RegistraChavePixResponse
-import br.com.zup.lucasmiguins.pix.enums.TipoDeChaveRequest
-import br.com.zup.lucasmiguins.pix.enums.TipoDeContaRequest
+import br.com.zup.lucasmiguins.pix.enums.TipoDeChaveRequest.EMAIL
+import br.com.zup.lucasmiguins.pix.enums.TipoDeContaRequest.CONTA_CORRENTE
 import br.com.zup.lucasmiguins.shared.grpc.KeyManagerGrpcFactory
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Replaces
@@ -11,9 +11,11 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
+import io.micronaut.http.client.exceptions.HttpClientResponseException
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito
 import java.util.*
@@ -47,9 +49,9 @@ internal class RegistraPixChavePixControllerTest {
 
 
         val novaChavePix = NovaChavePixRequest(
-            tipoDeConta = TipoDeContaRequest.CONTA_CORRENTE,
+            tipoDeConta = CONTA_CORRENTE,
             chave = "ponte@email2.com",
-            tipoDeChave = TipoDeChaveRequest.EMAIL
+            tipoDeChave = EMAIL
         )
 
         val request = HttpRequest.POST("/api/v1/clientes/$clienteId/pix", novaChavePix)
@@ -60,6 +62,23 @@ internal class RegistraPixChavePixControllerTest {
         assertTrue(response.header("Location")!!.contains(pixId))
     }
 
+    @Test
+    internal fun `deve retornar um erro quando dados invalidos`() {
+        val clienteId = UUID.randomUUID().toString()
+
+        val novaChavePix = NovaChavePixRequest(
+            tipoDeConta = null,
+            chave = "",
+            tipoDeChave = null
+        )
+
+        val request = HttpRequest.POST("/api/v1/clientes/$clienteId/pix", novaChavePix)
+
+        val thrown = assertThrows<HttpClientResponseException> {
+           client.toBlocking().exchange(request, NovaChavePixRequest::class.java)
+        }
+        assertEquals(HttpStatus.BAD_REQUEST.code, thrown.status.code)
+    }
 
     @Factory
     @Replaces(factory = KeyManagerGrpcFactory::class)

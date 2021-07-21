@@ -4,21 +4,20 @@ import br.com.zup.lucasmiguins.grpc.KeymanagerRegistraGrpcServiceGrpc
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
-import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.micronaut.validation.Validated
 import java.util.*
 import javax.validation.Valid
 
 @Validated
-@Controller("/api/v1/clientes")
+@Controller("/api/v1/clientes/{clienteId}")
 class RegistraPixChavePixController(
 
     private val registraChavePixClient: KeymanagerRegistraGrpcServiceGrpc.KeymanagerRegistraGrpcServiceBlockingStub
 ) {
 
-    @Post("/{clienteId}/pix")
-    fun registra(@PathVariable clienteId: UUID, @Valid @Body request: NovaChavePixRequest): HttpResponse<Any> {
+    @Post("/pix")
+    fun registra(clienteId: UUID, @Valid @Body request: NovaChavePixRequest): HttpResponse<Any> {
 
         val grpcResponse = registraChavePixClient.registra(request.paraModeloGrpc(clienteId))
 
